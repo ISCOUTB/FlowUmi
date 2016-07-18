@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <link href="./../../resources/css/default.css" rel="stylesheet" type="text/css" />
+        <link href="./../../resources/css/cssLayout.css" rel="stylesheet" type="text/css" />
+        <h:outputStylesheet library="css" name="default.css" />
+        <f:loadBundle var="label" basename="labels" />
+        <title>#{label['title.app']}</title>
+    </h:head>
+
+    <h:body>
+        <h:form>
+            <p:idleMonitor onactive="sessionTimeOutDialog.show()" 
+                           timeout="#{session.maxInactiveInterval * 1000}" />
+
+            <p:dialog header="#{label['tiempo.inactividad']}" 
+                      widgetVar="sessionTimeOutDialog"
+                      modal="true" closable="false" width="400">
+                <h:outputText value="#{label['leyenda.inactividad']}" />
+            </p:dialog>
+        </h:form>
+        <div id="AppHeader">
+            <h:form>
+                <p:menubar> 
+                    <p:menuitem value="#{label['inicio']}" url="/faces/pages/AdminInicio.xhtml" /> 
+                    <p:submenu label="#{label['usuarios']}" >
+                        <p:menuitem value="#{label['lista_usuarios']}" url="/faces/pages/AdminListaUsuarios.xhtml" /> 
+                        <p:menuitem value="#{label['agregar_usuarios']}" url="/faces/pages/AdminAgregarUsuario.xhtml" />  
+                    </p:submenu>
+                    <p:submenu label="#{label['cursos']}" >
+                        <p:menuitem value="#{label['crear_curso']}" url="/faces/pages/AdminAgregarCurso.xhtml" />  
+                        <p:menuitem value="#{label['lista_curso']}" url="/faces/pages/AdminListaCursos.xhtml" />  
+                    </p:submenu>
+
+                    <f:facet name="options">  
+                        <p:outputLabel value="#{sessionFlowumiUtil.usuario.nombre} - #{sessionFlowumiUtil.usuario.nombreUsuario}"/>
+                        <p:commandButton type="button" value="#{label['salir']}" icon="ui-icon-extlink" action="#{sessionFlowumiUtil.Desconectar()}"/>  
+                    </f:facet>  
+                </p:menubar> 
+            </h:form>
+        </div>
+        <div id="content" class="center_content">
+            <ui:insert name="content">Content</ui:insert>
+        </div>
+        <div id="mensajes">
+            <h:form>
+                <p:messages /> 
+            </h:form>
+        </div>
+    </h:body>
+
+</html>

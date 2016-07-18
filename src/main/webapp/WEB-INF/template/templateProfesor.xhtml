@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <link href="./../../resources/css/default.css" rel="stylesheet" type="text/css" />
+        <link href="./../../resources/css/cssLayout.css" rel="stylesheet" type="text/css" />
+        
+        
+            <h:outputStylesheet library="css/blitzer" name="jquery-ui-1.10.3.custom.css" />
+        <h:outputStylesheet library="css" name="default.css" />
+            <h:outputScript name="js/jquery.jsPlumb-1.3.16-all.js"/>
+        <f:loadBundle var="label" basename="labels" />
+        <title>#{label['title.app']}</title>
+    </h:head>
+
+    <h:body>
+        <h:form>
+            <p:idleMonitor onactive="sessionTimeOutDialog.show()" 
+                           timeout="#{session.maxInactiveInterval * 1000}" />
+
+            <p:dialog header="#{label['sesion_caducada']}" 
+                      widgetVar="sessionTimeOutDialog"
+                      modal="true" closable="false" width="400">
+                <h:outputText value="#{label['leyenda_caducada']}" />
+            </p:dialog>
+        </h:form>
+        <div id="AppHeader">
+            <h:form>
+                <p:menubar> 
+
+                    <p:menuitem value="#{label['inicio']}" url="/faces/pages/ProfesorInicio.xhtml" /> 
+
+                    <f:facet name="options">  
+                        <p:outputLabel value="#{sessionFlowumiUtil.usuario.nombre} - #{sessionFlowumiUtil.usuario.nombreUsuario}"/>
+                        <p:commandButton value="#{label['salir']}" icon="ui-icon-extlink" action="#{sessionFlowumiUtil.Desconectar()}"/>  
+                    </f:facet>  
+                </p:menubar> 
+            </h:form>
+        </div>
+        <div id="content" class="center_content">
+            <ui:insert name="content">Content</ui:insert>
+        </div>
+        <div id="mensajes">
+            <h:form>
+                <p:messages id="messages"/> 
+            </h:form>
+        </div>
+    </h:body>
+
+</html>

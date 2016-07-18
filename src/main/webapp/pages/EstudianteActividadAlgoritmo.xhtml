@@ -1,0 +1,230 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:gpc="http://java.sun.com/jsf/composite/gpc_comp"
+                template="./../WEB-INF/template/templateEstudiante.xhtml">
+
+    <ui:define name="content">
+        <h:form>
+            <p:inputTextarea id="connections" value="#{estudianteActividadAlgoritmoBean.conecciones}"/>
+            <p:inputTextarea id="nodes" value="#{estudianteActividadAlgoritmoBean.nodos}"/>
+            <p:inputTextarea id="numNodes" value="#{estudianteActividadAlgoritmoBean.numNodos}"/>
+            <div id="menu" >
+                <p:menubar styleClass="menubaralgoritmo">
+                    <p:submenu label="Archivo" icon="ui-icon-document">  
+                        <p:menuitem value="Guardar" onclick="getInformation()" action="#{estudianteActividadAlgoritmoBean.guardarAlgoritmo()}" ajax="false"/> 
+                        <p:menuitem value="Enviar a calificación" />
+                        <p:separator />  
+                        <p:menuitem value="Salir" />  
+                    </p:submenu>
+                    <p:submenu label="Herramientas" icon="ui-icon-wrench">  
+                        <p:menuitem value="Algoritmo" /> 
+                        <p:menuitem value="Bloques" /> 
+                        <p:menuitem value="Consola" /> 
+                    </p:submenu>
+                    <p:submenu label="Acciones" icon="ui-icon-play">  
+                        <p:menuitem value="Compilar" onclick="getInformation()" action="#{estudianteActividadAlgoritmoBean.compilarAlgoritmo()}" ajax="false"/> 
+                        <p:menuitem value="Analizar casos" /> 
+                        <p:menuitem value="Correr" onclick="PF('idCorrer').show();"/> 
+                    </p:submenu>
+                    <p:submenu label="Algoritmo" icon="ui-icon-wrench">  
+                        <p:menuitem value="Agregar Funcion" onclick="PF('dlgFun').show();"/> 
+                        <p:menuitem value="Agregar Variable" onclick="PF('dlgVar').show();"/> 
+                    </p:submenu>
+                </p:menubar>
+            </div>
+
+            <div id="editor">
+                <p:layout styleClass="layoutalgoritmo" >
+                    <p:layoutUnit position="north" style="text-align: center;">
+                        <p:outputLabel value="#{estudianteActividadAlgoritmoBean.entorno.actual}"/>
+                    </p:layoutUnit>
+                    <p:layoutUnit position="south" size="200" header="Consola" resizable="true" closable="true" collapsible="true" >
+                        <h:inputTextarea value="#{estudianteActividadAlgoritmoBean.consola}" id="consoleId" style="width:99%; height:93%"/> 
+                    </p:layoutUnit>
+                    <p:layoutUnit position="west" size="200" header="Bloques" resizable="true" closable="true" collapsible="true" >  
+                        <p:panelGrid columns="1" style="width: 100%;" >
+                            <p:commandButton value="Asignacion" onclick="setTipoNodo(2)" style="width: 100%;"></p:commandButton> 
+                            <p:commandButton value="Mientras" onclick="setTipoNodo(3)" style="width: 100%;"></p:commandButton>
+                            <p:commandButton value="Si" onclick="setTipoNodo(4)" style="width: 100%;"></p:commandButton>
+                            <p:commandButton value="Sino" onclick="setTipoNodo(5)" style="width: 100%;"></p:commandButton>
+                            <p:commandButton value="Para" onclick="setTipoNodo(6)" style="width: 100%;"></p:commandButton>
+                            <p:commandButton value="Lectura" onclick="setTipoNodo(7)" style="width: 100%;"></p:commandButton>
+                            <p:commandButton value="Escritura" onclick="setTipoNodo(8)" style="width: 100%;"></p:commandButton>
+                            <p:commandButton value="Funcion" onclick="setTipoNodo(9)" style="width: 100%;"></p:commandButton>
+                            <p:commandButton value="Break" onclick="setTipoNodo(10)" style="width: 100%;"></p:commandButton>
+                        </p:panelGrid>
+                    </p:layoutUnit>  
+
+                    <p:layoutUnit position="east" size="300" header="Algoritmo" resizable="true" closable="true" collapsible="true" >  
+                        <p:dataGrid id="listaFunciones" var="fun" value="#{estudianteActividadAlgoritmoBean.funciones}" columns="1">
+                            <p:panelGrid columns="1">
+                                <f:facet name="header">  
+                                    #{fun.id} <p:commandButton icon="ui-icon-search" onclick="getInformation()" action="#{estudianteActividadAlgoritmoBean.cambiarActual(fun.id)}" ajax="false"/>
+                                </f:facet> 
+                                <p:dataTable var="var" value="#{fun.parametrosLista}">
+                                    <f:facet name="header">  
+                                        Parametros
+                                    </f:facet> 
+                                    <p:column headerText="nombre">  
+                                        <h:outputText value="#{var.id}" />  
+                                    </p:column>  
+
+                                    <p:column headerText="TD">  
+                                        <h:outputText value="#{var.tipoDato}" />  
+                                    </p:column>  
+
+                                    <p:column headerText="TE">  
+                                        <h:outputText value="#{var.tipoEstructura}" />  
+                                    </p:column>
+
+                                    <p:column headerText="VI">  
+                                        <h:outputText value="#{var.valorInicial}" />  
+                                    </p:column>
+                                </p:dataTable>
+
+                                <p:dataTable var="var" value="#{fun.variablesEntornoLista}">
+                                    <f:facet name="header">  
+                                        Variables
+                                    </f:facet> 
+                                    <p:column headerText="nombre">  
+                                        <h:outputText value="#{var.id}" />  
+                                    </p:column>  
+
+                                    <p:column headerText="TD">  
+                                        <h:outputText value="#{var.tipoDato}" />  
+                                    </p:column>  
+
+                                    <p:column headerText="TE">  
+                                        <h:outputText value="#{var.tipoEstructura}" />  
+                                    </p:column>
+
+                                    <p:column headerText="VI">  
+                                        <h:outputText value="#{var.valorInicial}" />  
+                                    </p:column>
+                                </p:dataTable>
+                            </p:panelGrid>
+                        </p:dataGrid>
+                    </p:layoutUnit>   
+                    <p:layoutUnit position="center" size="600" >
+                        <div id="container"></div> 
+                    </p:layoutUnit>
+                </p:layout>
+            </div>
+            <h:outputScript name="js/CreadorAlgoritmo.js"/>
+            <script>
+                //<![CDATA[
+                $(document).ready(function() {
+                    setNumeroNodos(#{estudianteActividadAlgoritmoBean.funcionActual.numeroUltimoNodo.toString()});
+                #{estudianteActividadAlgoritmoBean.script};
+                    });
+                    function getInformation(){
+                        var idConnections = "#{p:component('connections')}";
+                        var idNodes = "#{p:component('nodes')}";
+                        var numNodes = "#{p:component('numNodes')}";
+                        document.getElementById(idConnections).value = getConnectionInformation();
+                        document.getElementById(idNodes).value = getNodesInformation();
+                        document.getElementById(numNodes).value = getNumeroNodos();
+                    }
+                    //]]>
+            </script>
+        </h:form>
+        <h:form >
+            <p:dialog id="idCrearVariable" header="#{label['crear_variable']}" widgetVar="dlgVar" modal="true">
+                <p:panelGrid columns="2">  
+                    <h:outputLabel for="idVar" value="Nombre: *" />  
+                    <p:inputText id="idVar" value="#{estudianteActividadAlgoritmoBean.variableNueva.id}"/>  
+
+                    <h:outputLabel value="Funcion: *" />  
+                    <p:selectOneMenu value="#{estudianteActividadAlgoritmoBean.variableNueva.ambito}" style="width: 100px">
+                        <f:selectItem itemLabel="Escoje una" itemValue=""/>
+                        <f:selectItems value="#{estudianteActividadAlgoritmoBean.funciones}" var="fun" itemLabel="#{fun.id}" itemValue="#{fun.id}"/>  
+                    </p:selectOneMenu> 
+
+                    <h:outputLabel value="Tipo de dato: *" />  
+                    <p:selectOneMenu value="#{estudianteActividadAlgoritmoBean.variableNueva.tipoDato}" style="width: 100px">
+                        <f:selectItem itemLabel="Escoje una" itemValue=""/>
+                        <f:selectItems value="#{estudianteActividadAlgoritmoBean.tipoDatos}" var="tipo" itemLabel="#{tipo}" itemValue="#{tipo}"/>  
+                    </p:selectOneMenu> 
+
+                    <h:outputLabel for="idVarIni" value="Valor Inicial: *" />  
+                    <p:inputText id="idVarIni" value="#{estudianteActividadAlgoritmoBean.variableNueva.valorInicial}"/> 
+
+                    <h:outputLabel value="Tipo de estructura: *" />  
+                    <p:selectOneMenu value="#{estudianteActividadAlgoritmoBean.variableNueva.tipoEstructura}" style="width: 100px">
+                        <f:selectItem itemLabel="Escoje una" itemValue=""/>
+                        <f:selectItems value="#{estudianteActividadAlgoritmoBean.tipoEstructuras}" var="tipo" itemLabel="#{tipo}" itemValue="#{tipo}"/>  
+                    </p:selectOneMenu> 
+
+                    <h:outputLabel for="idVarind1" value="Indice 1: *" />  
+                    <p:inputText id="idVarind1" value="#{estudianteActividadAlgoritmoBean.variableNueva.indice1}"/> 
+
+                    <h:outputLabel for="idVarind2" value="Indice 2: *" />  
+                    <p:inputText id="idVarind2" value="#{estudianteActividadAlgoritmoBean.variableNueva.indice2}"/> 
+
+                    <f:facet name="footer">  
+                        <p:commandButton value="Agregar Variable" 
+                                         icon="ui-icon-check" 
+                                         style="margin:0" 
+                                         oncomplete="dlgVar.hide();"
+                                         update=":#{p:component('listaFunciones')}"
+                                         action="#{estudianteActividadAlgoritmoBean.crearVariable(true)}"/>  
+                        <p:commandButton value="Agregar Parametro" 
+                                         icon="ui-icon-check" 
+                                         style="margin:0" 
+                                         oncomplete="dlgVar.hide();"
+                                         update=":#{p:component('listaFunciones')}"
+                                         action="#{estudianteActividadAlgoritmoBean.crearVariable(false)}"/>  
+                    </f:facet>  
+                </p:panelGrid> 
+            </p:dialog>
+        </h:form>
+
+        <h:form>
+            <p:dialog id="idCrearFuncion" header="#{label['crear_funcion']}" widgetVar="dlgFun" modal="true">
+                <p:panelGrid columns="2">  
+                    <h:outputLabel for="idFun" value="Nombre: *" />  
+                    <p:inputText id="idFun" value="#{estudianteActividadAlgoritmoBean.funcionNueva.id}"/> 
+
+                    <h:outputLabel value="Tipo de dato de retorno: *" />  
+                    <p:selectOneMenu value="#{estudianteActividadAlgoritmoBean.funcionNueva.tipoDatoRetorno}" style="width: 100px">
+                        <f:selectItem itemLabel="Escoje una" itemValue=""/>
+                        <f:selectItems value="#{estudianteActividadAlgoritmoBean.tipoDatoRetorno}" var="tipo" itemLabel="#{tipo}" itemValue="#{tipo}"/>  
+                    </p:selectOneMenu> 
+
+                    <f:facet name="footer">  
+                        <p:commandButton value="Crear" 
+                                         icon="ui-icon-check" 
+                                         style="margin:0" 
+                                         ajax="false"
+                                         oncomplete="dlgFun.hide();"
+                                         onclick="getInformation()"
+                                         action="#{estudianteActividadAlgoritmoBean.crearFuncion()}"/>  
+                    </f:facet>  
+                </p:panelGrid> 
+            </p:dialog>
+        </h:form>
+
+        <h:form>
+            <p:dialog id="idCorrer" header="#{label['correr']}" widgetVar="idCorrer" modal="true">
+                <p:panelGrid columns="2">  
+                    <h:outputLabel for="idEntradas" value="Entradas: *" />  
+                    <p:inputTextarea id="idEntradas" value="#{estudianteActividadAlgoritmoBean.entradas}"/> 
+
+                    <f:facet name="footer">  
+                        <p:commandButton value="Crear" 
+                                         icon="ui-icon-check" 
+                                         style="margin:0" 
+                                         ajax="false"
+                                         oncomplete="idCorrer.hide();"
+                                         action="#{estudianteActividadAlgoritmoBean.correrAlgoritmo()}"/>  
+                    </f:facet>  
+                </p:panelGrid> 
+            </p:dialog>
+        </h:form>
+    </ui:define>            
+</ui:composition>
